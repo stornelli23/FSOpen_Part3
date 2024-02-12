@@ -1,7 +1,15 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
+// app.use(morgan('tiny'))
+morgan.token('req-body', (req, res) => {
+  return JSON.stringify(req.body);
+});
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
+
+
 
 let persons = [
   { 
@@ -30,6 +38,12 @@ app.get("/", (request, response) => {
   response.send("<h1>Helloooo World!</h1>");
 });
 
+app.get("/info", (req, res) => {
+  const personsLength = persons.length;
+  const resTime = new Date()
+  res.send(`<p>Phonebook has info for ${personsLength} people</p><p>${resTime}</p>`)
+})
+
 app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
@@ -47,29 +61,39 @@ app.delete("/api/persons/:id", (request, response) => {
 });
 
 
-const generateId = () => {
-  const maxId = persons.length > 0
-    ? Math.max(...persons.map(n => n.id))
-    : 0
-  return maxId + 1
-
-  //persons.map(n => n.id) is an array so it can't directly be given as a parameter to Math.max.
-  //The array can be transformed into individual numbers by using the "three dot" spread syntax ....
+const generateRandomId = () => {
+  const min = persons.length + 1;
+  const max = 1000000;
+  return Math.floor((Math.random() * (max - min + 1)) + min);
 }
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
-
+  const alreadyExist = persons.some(person => person.name === body.name);
+  
   if (!body.name) {
     return response.status(400).json({ 
       error: 'name missing' 
-    })
+    });
   }
+  
+  if (alreadyExist) {
+    return response.status(400).json({ 
+      error: 'name already exists' 
+    });
+  }
+  
+  if (!body.number) {
+    return response.status(400).json({ 
+      error: 'number missing' 
+    });
+  }
+  
 
   const person = {
     name: body.name,
     number: body.number,
-    id: generateId(),
+    id: generateRandomId(),
   }
 
   persons = persons.concat(person)
