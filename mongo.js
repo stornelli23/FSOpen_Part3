@@ -18,40 +18,13 @@ const personaSchema = new mongoose.Schema({
 
 const Persona = mongoose.model('Persona', personaSchema)
 
-const persona = new Persona({
-    name: process.argv[3],
-    number: process.argv[4],
-  })
-
-//   persona.save().then(() => {
-//     console.log(`Added ${persona.name} number ${persona.number} to the phonebook`)
-//     mongoose.connection.close()
-//   })
-
-
-  Persona
+Persona
   .find({}).then(result => {
-      console.log('Phonebook:')
-      result.forEach(persona => {
-        console.log(persona.name + " " + persona.number)
-      })
-      mongoose.connection.close()
+    console.log('Phonebook:')
+    result.forEach(persona => {
+      console.log(persona.name + ' ' + persona.number)
     })
-
-// if(process.argv.length===3){
-//     Persona
-//     .find({}).then(result => {
-//         console.log('Phonebook:')
-//         result.forEach(persona => {
-//           console.log(persona.name + persona.number)
-//         })
-//         mongoose.connection.close()
-//       })
-// }else{
-//     persona.save().then(() => {
-//         console.log(`Added ${persona.name} number ${persona.number} to the phonebook`)
-//         mongoose.connection.close()
-//       })
-// }
+    mongoose.connection.close()
+  })
 
 
