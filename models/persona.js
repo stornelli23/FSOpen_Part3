@@ -15,8 +15,23 @@ mongoose.connect(url)
     })
 
 const personaSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true
+    },
+  number: {
+    type:  String,
+    minLength: 8,
+    validate: {
+      validator: function (v) {
+          // Regular expression to match the phone number format
+          return /^\d{2,3}-\d{7,}$/g.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+  },
+  required: true
+  },
 })
 
 personaSchema.set('toJSON', {
